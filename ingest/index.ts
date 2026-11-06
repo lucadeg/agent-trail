@@ -196,9 +196,11 @@ export async function start(): Promise<void> {
     // Start HTTP server before filesystem discovery and initial indexing. Health
     // reports ready=false until the bounded warmup sync completes, but TCP is
     // available immediately so Next.js startup is no longer blocked by history.
+    // Agent session history is sensitive: never listen on external interfaces.
     const server = serve({
       fetch: app.fetch,
       port: config.port,
+      hostname: '127.0.0.1',
     });
 
     const syncScheduler = createSyncScheduler(
