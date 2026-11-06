@@ -110,7 +110,7 @@ const ingest = spawnManaged("ingest", process.execPath, [ingestEntry], {
 keyLog(`[agent-trail] dashboard: http://localhost:${port}`);
 const server = spawnManaged("dashboard", process.execPath, [serverEntry], {
   cwd: standaloneRoot,
-  env: { ...baseEnv, PORT: port, HOSTNAME: process.env.HOSTNAME || "0.0.0.0" },
+  env: { ...baseEnv, PORT: port, HOSTNAME: process.env.HOSTNAME || "127.0.0.1" },
 });
 
 let shuttingDown = false;
