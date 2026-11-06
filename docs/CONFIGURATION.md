@@ -198,3 +198,14 @@ OPENCODE_DB_PATH=/Users/<you>/.local/share/opencode/opencode.db
 | 健康覆盖层永远停留在 "检查中" | 摄取服务已启动但 `INGEST_STARTUP_SYNC_LIMIT` 很大，预热尚未完成 | 降低限制值或设为 `0` 跳过预热；全量同步仍在后台运行 |
 
 关于"我修改了解析器但数据库显示过时数据"的问题，请参阅 [`services/ingest.md`](services/ingest.md) 中的跳过缓存章节：升级 `PARSER_CACHE_VERSION` 或使用 `{"force": true}` 调用 `POST /api/v1/sources/:type/sync`。
+
+
+---
+
+## Ingest HTTP 监听地址（安全边界）
+
+- Ingest API 使用固定 `127.0.0.1` 监听地址，避免包含完整 agent session、工具调用和聊天内容的 HTTP API 意外暴露到 LAN / Internet。
+- 打包 npm CLI 的 Next.js dashboard 默认也使用 `127.0.0.1`；若需代理或容器网络，须显式设置 `HOSTNAME`，并确认防火墙与访问控制。
+- Dockerfile 已设置 `HOSTNAME=0.0.0.0` 用于容器内 UI 监听；Compose 示例仅对宿主机 `127.0.0.1:3030` 发布端口。Ingest 仍保持 `127.0.0.1`，供容器内 Next.js 访问。
+- 该改动需要重新构建 / 发布 npm 包或容器镜像。现有已发布的 `@camtrik/agent-trail@0.1.7` 二进制不会自动继承源码修复。
+- 不要把 Ingest API 的端口直接映射到公网。这里的 loopback 限制不构成多用户认证机制。
